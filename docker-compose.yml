@@ -1,0 +1,11 @@
+version: "2"
+services:
+  web:
+    build: .
+    ports:
+      - "1316:8888"
+      - "1313:5000"
+      - "1317:5151"
+    volumes:
+      - /home/jordan:/host
+    runtime: nvidia
