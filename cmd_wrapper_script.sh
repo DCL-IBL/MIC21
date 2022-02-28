@@ -1,12 +1,12 @@
 #!/bin/bash
 
-cd /host/app1/fiftyone
+cd /host/mic21-framework/fiftyone
 bash install.bash -d
 
-python3 /host/app1/fiftyone/fiftyone/server/main.py &
+python3 /host/mic21-framework/fiftyone/fiftyone/server/main.py &
 
 sleep 100
-python3 /host/app1/server/app.py &
+python3 /host/mic21-framework/server/app.py &
 
 cd /
 jupyter notebook --port=8888 --no-browser --ip=0.0.0.0 --allow-root --NotebookApp.token='' --NotebookApp.password=''

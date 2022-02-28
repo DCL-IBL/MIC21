@@ -7,7 +7,7 @@ import fiftyone as fo
 import fo_utils
 import det2_utils
 
-UPLOAD_PATH = '/host/app1/uploads'
+UPLOAD_PATH = '/host/mic21-framework/uploads'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
 app = Flask(__name__,static_folder='')
@@ -51,7 +51,7 @@ def upload_file():
             return redirect(request.url)
         categ = request.form['categ_name']
         folder_path = '/uploads/'+categ+'/'
-        full_path = '/host/app1/server'+folder_path
+        full_path = '/host/mic21-framework/server'+folder_path
         if not os.path.exists(full_path):
             os.mkdir(full_path)
         file = request.files['file']
@@ -65,13 +65,13 @@ def upload_file():
             
             dataset = fo.load_dataset(categ)
             dataset.add_sample(fo.Sample(filepath=full_name))
-            out_name = '/host/app1/server/uploads/buf.json'
+            out_name = '/host/mic21-framework/server/uploads/buf.json'
             
-            os.system("rm /host/dir1/image_out/*.*")
-            os.system("cp "+full_name+" /host/dir1/image_out/")
-            os.system("python3 /host/dir1/prepare_dataset.py --idir=/host/dir1/image_out --outfile=/host/dir1/info.json")
-            os.system("python3 /host/dir1/yolact/eval.py --trained_model=/host/dir1/yolact/yolact_base_54_800000.pth --score_threshold=0.9 --output_web_json --dataset=test1 --cuda=0 --web_det_path=/host/dir1/yolact/web/dets")
-            os.system("mv /host/dir1/yolact/web/dets/yolact_base.json "+out_name)
+            os.system("rm /host/mic21-framework/image_out/*.*")
+            os.system("cp "+full_name+" /host/mic21-framework/image_out/")
+            os.system("python3 /host/mic21-framework/prepare_dataset.py --idir=/host/mic21-framework/image_out --outfile=/host/mic21-framework/info.json")
+            os.system("python3 /host/mic21-framework/yolact/eval.py --trained_model=/host/mic21-framework/yolact/yolact_base_54_800000.pth --score_threshold=0.9 --output_web_json --dataset=test1 --cuda=0 --web_det_path=/host/mic21-framework/yolact/web/dets")
+            os.system("mv /host/mic21-framework/yolact/web/dets/yolact_base.json "+out_name)
             fo_utils.create_prediction(dataset,full_path,'yolact',out_name)
             
             pred = det2_utils.prepare_detectron2_predictor(0.9)
@@ -108,7 +108,7 @@ def load_dataset():
     if request.method == 'GET':
         categ = request.args.get("categ_name")
         folder_path = '/uploads/'+categ+'/'
-        full_path = '/host/app1/server'+folder_path
+        full_path = '/host/mic21-framework/server'+folder_path
         try:
             dataset = fo.load_dataset(categ)
             dataset.delete()
@@ -116,10 +116,10 @@ def load_dataset():
             print("New dataset")
         dataset = fo.Dataset.from_dir(dataset_dir=full_path, dataset_type=fo.types.ImageDirectory, name=categ)
         dataset.persistent = True
-        yolact_name = '/host/app1/server/uploads/'+categ+'_yolact.json'
-        detectron2_name = '/host/app1/server/uploads/'+categ+'_detectron2.json'
-        mic21_name = '/host/app1/server/uploads/'+categ+'_mic21.json'
-        gtruth_name = '/host/app1/server/uploads/'+categ+'_gt.json'
+        yolact_name = '/host/mic21-framework/server/uploads/'+categ+'_yolact.json'
+        detectron2_name = '/host/mic21-framework/server/uploads/'+categ+'_detectron2.json'
+        mic21_name = '/host/mic21-framework/server/uploads/'+categ+'_mic21.json'
+        gtruth_name = '/host/mic21-framework/server/uploads/'+categ+'_gt.json'
         if os.path.exists(yolact_name):
             fo_utils.create_prediction(dataset,full_path,'yolact',yolact_name)
         if os.path.exists(detectron2_name):
@@ -138,22 +138,22 @@ def predict():
         categ = request.args.get("categ_name")
         threshold = float(request.args.get("threshold"))
         folder_path = '/uploads/'+categ+'/'
-        full_path = '/host/app1/server'+folder_path
+        full_path = '/host/mic21-framework/server'+folder_path
         if model == 'yolact':
-            os.system("rm /host/dir1/image_out/*.*")
-            os.system("cp "+full_path+"*.* /host/dir1/image_out/")
-            os.system("python3 /host/dir1/prepare_dataset.py --idir=/host/dir1/image_out --outfile=/host/dir1/info.json")
-            os.system("python3 /host/dir1/yolact/eval.py --trained_model=/host/dir1/yolact/yolact_base_54_800000.pth --score_threshold="+str(threshold)+" --output_web_json --dataset=test1 --cuda=0 --web_det_path=/host/dir1/yolact/web/dets")
-            os.system("mv /host/dir1/yolact/web/dets/yolact_base.json /host/app1/server/uploads/"+categ+"_yolact.json")
+            os.system("rm /host/mic21-framework/image_out/*.*")
+            os.system("cp "+full_path+"*.* /host/mic21-framework/image_out/")
+            os.system("python3 /host/mic21-framework/prepare_dataset.py --idir=/host/mic21-framework/image_out --outfile=/host/mic21-framework/info.json")
+            os.system("python3 /host/mic21-framework/yolact/eval.py --trained_model=/host/mic21-framework/yolact/yolact_base_54_800000.pth --score_threshold="+str(threshold)+" --output_web_json --dataset=test1 --cuda=0 --web_det_path=/host/mic21-framework/yolact/web/dets")
+            os.system("mv /host/mic21-framework/yolact/web/dets/yolact_base.json /host/mic21-framework/server/uploads/"+categ+"_yolact.json")
         if model == 'detectron2':
             pred = det2_utils.prepare_detectron2_predictor(threshold)
-            det2_utils.prediction_with_detectron2("/host/app1/server/uploads/"+categ,
+            det2_utils.prediction_with_detectron2("/host/mic21-framework/server/uploads/"+categ,
                                                   pred,
-                                                  "/host/app1/server/uploads/"+categ+"_detectron2.json")
+                                                  "/host/mic21-framework/server/uploads/"+categ+"_detectron2.json")
         if model == 'mic21':
             pred = det2_utils.prepare_mic21_predictor(threshold,categ)
             print(pred)
-            det2_utils.prediction_with_mic21(categ,pred,"/host/app1/server/uploads/"+categ+"_mic21.json")
+            det2_utils.prediction_with_mic21(categ,pred,"/host/mic21-framework/server/uploads/"+categ+"_mic21.json")
         return "<html><head></head><body></body></html>"
             
 
@@ -163,7 +163,7 @@ def show():
     if request.method == 'GET':
         categ = request.args.get("categ_name")
         folder_path = '/uploads/'+categ+'/'
-        full_path = '/host/app1/server'+folder_path
+        full_path = '/host/mic21-framework/server'+folder_path
         return "<html><head></head><body></body></html>"
         
 @app.route('/get_image_links/', methods=['GET'])
@@ -172,7 +172,7 @@ def get_image_links():
     if request.method == 'GET':
         categ = request.args.get("categ_name")
         folder_path = '/uploads/'+categ+'/'
-        full_path = '/host/app1/server'+folder_path
+        full_path = '/host/mic21-framework/server'+folder_path
         app.config['UPLOAD_PATH'] = full_path
         if os.path.exists(full_path):
             for f in os.listdir(full_path):

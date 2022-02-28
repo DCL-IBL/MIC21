@@ -7,5 +7,5 @@ services:
       - "1313:5000"
       - "1317:5151"
     volumes:
-      - /home/jordan:/host
+      - ../:/host
     runtime: nvidia
