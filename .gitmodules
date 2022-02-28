@@ -1,3 +1,6 @@
 [submodule "yolact"]
 	path = yolact
 	url = https://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@github.com/DCL-IBL/yolact.git
+[submodule "fiftyone"]
+	path = fiftyone
+	url = https://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@github.com/DCL-IBL/fiftyone.git
