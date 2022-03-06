@@ -21,3 +21,19 @@ MIC21 models are pretrained  ……….
 	Download MIC21 models  from …. and ….
 
 **Installation**
+
+Clone the git repository for the framework:
+
+```git clone https://github.com/DCL-IBL/mic21-framework.git```
+
+Navigate to the top directory of the mic21 framework:
+
+```cd mic21-framework```
+
+Download [mic21 model images](https://dcl.bas.bg/MIC-21/model_images/) together with annotations in JSON into `/server/uploads` subdirectory 
+
+```wget -r -np -k https://dcl.bas.bg/MIC-21/model_images/ -P ./server/uploads```
+
+
+docker-compose up
+

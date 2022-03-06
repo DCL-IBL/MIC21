@@ -31,7 +31,7 @@ def prepare_detectron2_predictor(th):
     return DefaultPredictor(cfg)
 
 def prepare_mic21_predictor(th,model_name):
-    gt_c = json.load(open('/host/comparison/'+model_name+'/'+model_name+'_train.json','r'))
+    gt_c = json.load(open('/host/mic21-framework/server/'+model_name+'_gt.json','r'))
     cfg = get_cfg()
     cfg.merge_from_file('/detectron2/configs/COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_1x.yaml')
     cfg.MODEL.RETINANET.SCORE_THRESH_TEST = th
@@ -42,7 +42,7 @@ def prepare_mic21_predictor(th,model_name):
     pred = DefaultPredictor(cfg)
     checkpointer = DetectionCheckpointer(pred.model)
     try:
-        checkpointer.load('/host/app1/work/output/'+model_name+'.pth')
+        checkpointer.load('/host/mic21-framework/work/output/'+model_name+'.pth')
         return pred
     except:
         return None
@@ -65,7 +65,10 @@ def prediction_with_detectron2(idir,pred,fname):
             if fext != '.jpg' and fext != '.jpeg' and fext != '.png':
                 continue
             full_name = os.path.join(idir,f)
-            img = read_image(full_name)
+            try:
+                img = read_image(full_name)
+            except:
+                continue
             if len(img.shape) < 3:
                 continue
             if img.shape[2] != 3:
@@ -97,11 +100,11 @@ def prediction_with_detectron2(idir,pred,fname):
         fout.close()
 
 def prediction_with_mic21(folder_name,pred,fname):
-    idir = '/host/app1/server/uploads/'+folder_name+'/'
+    idir = '/host/mic21-framework/server/uploads/'+folder_name+'/'
     gt_cats = dict()
     
     out_json = {'images':[],'annotations':[],'categories':[]}
-    gt_c = json.load(open('/host/comparison/'+folder_name+'/'+folder_name+'_train.json','r'))
+    gt_c = json.load(open('/host/mic21-framework/server/'+folder_name+'_gt.json','r'))
     for (k,c) in enumerate(gt_c['categories']):
         out_json['categories'].append({'id':k,'name':c['name']})
             
@@ -113,7 +116,10 @@ def prediction_with_mic21(folder_name,pred,fname):
             continue
         print(f)
         full_name = os.path.join(idir,f)
-        img = read_image(full_name)
+        try:
+            img = read_image(full_name)
+        except:
+            continue
         if len(img.shape) < 3:
             continue
         if img.shape[2] != 3:
@@ -180,7 +186,7 @@ def prediction_with_mic21_single(full_name,folder_name,pred,fname):
     gt_cats = dict()
     
     out_json = {'images':[],'annotations':[],'categories':[]}
-    gt_c = json.load(open('/host/comparison/'+folder_name+'/'+folder_name+'_train.json','r'))
+    gt_c = json.load(open('/host/mic21-framework/server/'+folder_name+'_gt.json','r'))
     for (k,c) in enumerate(gt_c['categories']):
         out_json['categories'].append({'id':k,'name':c['name']})
             
