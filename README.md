@@ -10,15 +10,9 @@ The repository includes:
 4. Jupyter notebooks to visualize the detection pipeline at every step.
 5. Evaluation on MS COCO metrics integrated in FiftyOne
 
-**Evaluation and running MIC21 models in fiftyone
+**System requirements**
 
-**MIC21 models**
-
-MIC21 models are pretrained  ……….
-
-**Datasets**
-
-	Download MIC21 models  from …. and ….
+CUDA 11.3 capable graphic controller.
 
 **Installation**
 
@@ -34,6 +28,33 @@ Download [mic21 model images](https://dcl.bas.bg/MIC-21/model_images/) together 
 
 ```wget -r -np -k https://dcl.bas.bg/MIC-21/model_images/ -P ./server/uploads```
 
+Download [mic21 model weights](https://dcl.bas.bg/MIC-21/models/) into `/work/output` subdirectory.
 
-docker-compose up
+```wget -r -np -k https://dcl.bas.bg/MIC-21/models/ -P ./work/output```
+
+Setup the docker to host port mapping according to your preferences by modififying `docker-compose.yml`
+
+```
+version: "2"
+services:
+  web:
+    build: .
+    ports:
+      - "PORT_DEVL:8888"
+      - "PORT_SERV:5000"
+      - "PORT_VIEW:5151"
+    volumes:
+      - ../:/host
+    runtime: nvidia
+```
+
+where `PORT_DEVL` is the port for accessing jupyter notebooks used for training and accessing the models, `PORT_SERV` is the port for accessing the framework programming interface and the `PORT_VIEW` is used for accessing the visualization and presentation platform FiftyOne. 
+
+Build the docker image with
+
+```docker-compose build```
+
+Start the docker image with
+
+```docker-compose up```
 
