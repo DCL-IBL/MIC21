@@ -8,7 +8,7 @@ The repository includes:
 2. Training code for MS COCO.
 3. Pre-trained weights for MS COCO and above 800 labels.
 4. Jupyter notebooks to visualize the detection pipeline at every step.
-5. Evaluation on MS COCO metrics integrated in FiftyOne
+5. Evaluation on MS COCO metrics integrated in FiftyOne.
 
 **System requirements**
 
@@ -20,7 +20,7 @@ Clone the git repository for the framework:
 
 ```git clone https://github.com/DCL-IBL/mic21-framework.git```
 
-Navigate to the top directory of the mic21 framework:
+Navigate to the top directory of the MIC21 framework:
 
 ```cd mic21-framework```
 
