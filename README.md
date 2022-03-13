@@ -66,7 +66,7 @@ Start the docker image with
 
 **API server interface**
 
-All functions are accessed through http://domain:srv_port?path
+All functions are accessed through ```http://domain:srv_port?path```
 
 |Path | Function|
 |-----|---------|
