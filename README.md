@@ -64,9 +64,13 @@ Start the docker image with
 
 ```docker-compose up```
 
+Populate the database with
+
+```http://domain:srv_port/load_all_datasets```
+
 **API server interface**
 
-All functions are accessed through ```http://domain:srv_port?path```
+All functions are accessed through ```http://domain:srv_port/path```
 
 |Path | Function|
 |-----|---------|
