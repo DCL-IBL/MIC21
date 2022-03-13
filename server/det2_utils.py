@@ -31,7 +31,7 @@ def prepare_detectron2_predictor(th):
     return DefaultPredictor(cfg)
 
 def prepare_mic21_predictor(th,model_name):
-    gt_c = json.load(open('/host/mic21-framework/server/'+model_name+'_gt.json','r'))
+    gt_c = json.load(open('/host/mic21-framework/server/uploads/'+model_name+'_gt.json','r'))
     cfg = get_cfg()
     cfg.merge_from_file('/detectron2/configs/COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_1x.yaml')
     cfg.MODEL.RETINANET.SCORE_THRESH_TEST = th
@@ -104,7 +104,7 @@ def prediction_with_mic21(folder_name,pred,fname):
     gt_cats = dict()
     
     out_json = {'images':[],'annotations':[],'categories':[]}
-    gt_c = json.load(open('/host/mic21-framework/server/'+folder_name+'_gt.json','r'))
+    gt_c = json.load(open('/host/mic21-framework/server/uploads/'+folder_name+'_gt.json','r'))
     for (k,c) in enumerate(gt_c['categories']):
         out_json['categories'].append({'id':k,'name':c['name']})
             
@@ -186,7 +186,7 @@ def prediction_with_mic21_single(full_name,folder_name,pred,fname):
     gt_cats = dict()
     
     out_json = {'images':[],'annotations':[],'categories':[]}
-    gt_c = json.load(open('/host/mic21-framework/server/'+folder_name+'_gt.json','r'))
+    gt_c = json.load(open('/host/mic21-framework/server/uploads/'+folder_name+'_gt.json','r'))
     for (k,c) in enumerate(gt_c['categories']):
         out_json['categories'].append({'id':k,'name':c['name']})
             

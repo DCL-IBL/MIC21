@@ -48,7 +48,13 @@ services:
     runtime: nvidia
 ```
 
-where `PORT_DEVL` is the port for accessing jupyter notebooks used for training and accessing the models, `PORT_SERV` is the port for accessing the framework programming interface and the `PORT_VIEW` is used for accessing the visualization and presentation platform FiftyOne. 
+where `PORT_DEVL` is the port for accessing jupyter notebooks used for training and accessing the models, `PORT_SERV` is the port for accessing the framework programming interface and the `PORT_VIEW` is used for accessing the visualization and presentation platform FiftyOne. The development port (PORT_DEVL) is optional and might be kept closed. 
+
+Navigate to `/host/yolact` directory and download Yolact model weights used for prediction with:
+
+```
+wget --load-cookies /tmp/cookies.txt "https://docs.google.com/uc?export=download&confirm=$(wget --quiet --save-cookies /tmp/cookies.txt --keep-session-cookies --no-check-certificate 'https://docs.google.com/uc?export=download&id=1UYy3dMapbH1BnmtZU4WH1zbYgOzzHHf_' -O- | sed -rn 's/.*confirm=([0-9A-Za-z_]+).*/\1\n/p')&id=1UYy3dMapbH1BnmtZU4WH1zbYgOzzHHf_" -O yolact_base_54_800000.pth && rm -rf /tmp/cookies.txt
+```
 
 Build the docker image with
 
@@ -58,3 +64,20 @@ Start the docker image with
 
 ```docker-compose up```
 
+Populate the database with
+
+```http://domain:srv_port/load_all_datasets```
+
+**API server interface**
+
+All functions are accessed through ```http://domain:srv_port/path```
+
+|Path | Function|
+|-----|---------|
+|predict?model=yolact&categ_name=categ&threshold=0.9|Prediction of annotations using the Yolact software. Replace the categ with the categ name you intend to make a prediction on. The images from the category have to be uploaded in the server/uploads/categ folder. The threshold value can be modified in the range from 0 to 1.|
+|predict?model=detectron2&categ_name=categ&threshold=0.9|Prediction of annotations using the Detectron2 software. Replace the categ with the categ name you intend to make a prediction on. The images from the category have to be uploaded in the server/uploads/categ folder. The threshold value can be modified in the range from 0 to 1.|
+|predict?model=mic21&categ_name=categ&threshold=0.9|Prediction of annotations using the trained models from MIC21 annotations. Replace the categ with the categ name you intend to make a prediction on. The images from the category have to be uploaded in the server/uploads/categ folder. The threshold value can be modified in the range from 0 to 1. The weights of the trained model should be presented as a file work/output/categ.pth|
+|load_dataset?categ_name=categ|Import the images, their ground truth and predictions into fiftyone presentation framework for the dataset with a name categ. Images to import should be present into /server/uploads/categ folder. The function automatically scans for ground truth annotations (categ_gt.json) and predicted annotations (categ_yolact.json, categ_detectron2.json, categ_mic32.json) into server/uploads folder.|
+|load_all_datasets|Run this command initially to load all dataset into FiftyOne|
+|upload_file?categ_name=categ|A simple interface to upload a file to the particular dataset with a name categ (Deprecated, new images can be uploaded through the fiftyone client application)|
+|evaluate?categ_name=categ|Evaluate detections against ground truth and store the results into fiftyone application. Print the comparison statistics.|
