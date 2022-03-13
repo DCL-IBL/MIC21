@@ -48,7 +48,13 @@ services:
     runtime: nvidia
 ```
 
-where `PORT_DEVL` is the port for accessing jupyter notebooks used for training and accessing the models, `PORT_SERV` is the port for accessing the framework programming interface and the `PORT_VIEW` is used for accessing the visualization and presentation platform FiftyOne. 
+where `PORT_DEVL` is the port for accessing jupyter notebooks used for training and accessing the models, `PORT_SERV` is the port for accessing the framework programming interface and the `PORT_VIEW` is used for accessing the visualization and presentation platform FiftyOne. The development port (PORT_DEVL) is optional and might be kept closed. 
+
+Navigate to `/host/yolact` directory and download Yolact model weights used for prediction with:
+
+```
+wget --load-cookies /tmp/cookies.txt "https://docs.google.com/uc?export=download&confirm=$(wget --quiet --save-cookies /tmp/cookies.txt --keep-session-cookies --no-check-certificate 'https://docs.google.com/uc?export=download&id=1UYy3dMapbH1BnmtZU4WH1zbYgOzzHHf_' -O- | sed -rn 's/.*confirm=([0-9A-Za-z_]+).*/\1\n/p')&id=1UYy3dMapbH1BnmtZU4WH1zbYgOzzHHf_" -O yolact_base_54_800000.pth && rm -rf /tmp/cookies.txt
+```
 
 Build the docker image with
 
@@ -58,3 +64,10 @@ Start the docker image with
 
 ```docker-compose up```
 
+**API server interface**
+
+All functions are accessed through http://domain:srv_port?path
+
+|Path | Function|
+|-----|---------|
+|predict?model=yolact&categ_name=categ&threshold=0.9|Prediction of annotations using the Yolact software. Replace the categ with the categ name you intend to make a prediction on. The images from the category have to be uploaded in the server/uploads/categ folder. The threshold value can be modified in the range from 0 to 1.|

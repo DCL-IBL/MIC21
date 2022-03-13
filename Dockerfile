@@ -1,5 +1,5 @@
 FROM nvidia/cuda:11.3.0-base-ubuntu18.04
-RUN apt-get update && apt-get -y update
+RUN apt-get upgrade && apt-get -y update
 RUN apt-get install -y build-essential python3.7 python3-pip python3-dev
 RUN pip3 -q install pip --upgrade
 COPY requirements.txt .
@@ -18,7 +18,7 @@ RUN apt-get install -y curl
 RUN curl -fsSL https://deb.nodesource.com/setup_17.x | bash -
 RUN apt-get install -y nodejs
 RUN pip3 install mongo
-#RUN pip3 install fiftyone
+RUN pip3 install fiftyone
 #RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
 #RUN nvm install node
 RUN npm install -g yarn
