@@ -120,6 +120,8 @@ def prediction_with_mic21(folder_name,pred,fname):
             img = read_image(full_name)
         except:
             continue
+        if img is None:
+            continue
         if len(img.shape) < 3:
             continue
         if img.shape[2] != 3:

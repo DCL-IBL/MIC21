@@ -6,6 +6,7 @@ import json
 import fiftyone as fo
 import fo_utils
 import det2_utils
+import threading
 
 UPLOAD_PATH = '/host/mic21-framework/uploads'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
@@ -105,25 +106,30 @@ def upload_file():
 def load_single_dataset(categ):
     folder_path = '/uploads/'+categ+'/'
     full_path = '/host/mic21-framework/server'+folder_path
-    try:
-        dataset = fo.load_dataset(categ)
-        dataset.delete()
-    except:
-        print("New dataset")
-    dataset = fo.Dataset.from_dir(dataset_dir=full_path, dataset_type=fo.types.ImageDirectory, name=categ)
-    dataset.persistent = True
+    #try:
+    #    dataset = fo.load_dataset(categ)
+    #    dataset.delete()
+    #except:
+    #    print("New dataset")
+    #dataset = fo.Dataset.from_dir(dataset_dir=full_path, dataset_type=fo.types.ImageDirectory, name=categ)
+    #dataset.persistent = True
+    dataset = fo.load_dataset(categ)
     yolact_name = '/host/mic21-framework/server/uploads/'+categ+'_yolact.json'
     detectron2_name = '/host/mic21-framework/server/uploads/'+categ+'_detectron2.json'
     mic21_name = '/host/mic21-framework/server/uploads/'+categ+'_mic21.json'
     gtruth_name = '/host/mic21-framework/server/uploads/'+categ+'_gt.json'
     if os.path.exists(yolact_name):
         fo_utils.create_prediction(dataset,full_path,'yolact',yolact_name)
+        print('Yolact '+categ)
     if os.path.exists(detectron2_name):
         fo_utils.create_prediction(dataset,full_path,'detectron2',detectron2_name)
+        print('Detectron2 '+categ)
     if os.path.exists(mic21_name):
         fo_utils.create_prediction(dataset,full_path,'mic21',mic21_name)
+        print('MIC21 '+categ)
     if os.path.exists(gtruth_name):
         fo_utils.create_annotation(dataset,full_path,'ground_truth',gtruth_name)
+        print('Ground_Truth '+categ)
 
 @app.route('/load_dataset/', methods=['GET'])
 def load_dataset():
@@ -137,7 +143,30 @@ def load_all_datasets():
     if request.method == 'GET':
         update_categ = ['chess', 'skiing', 'weightlifting', 'climbing', 'cricket', 'flying', 'hockey', 'soccer', 'volleyball', 'tennis', 'skateboarding', 'swimming', 'rowing', 'roller skating', 'horse racing', 'steeplechase', 'jogging', 'gymnastics', 'golf', 'diving', 'car racing', 'boxing', 'bowling', 'billiard', 'beach volleyball', 'basketball', 'baseball', 'jumping', 'running', 'acrobatics', 'airplane', 'glider', 'helicopter', 'hot-air_balloon', 'bicycle', 'camper', 'convertible', 'jeep', 'limousine', 'sedan', 'taxi', 'wagon', 'carriage', 'motorcycle', 'bus', 'minibus', 'tram', 'trolleybus', 'road sign', 'traffic police', 'zebra crossing', 'boat', 'ferry', 'gondola', 'motorboat', 'sailing vessel', 'ship', 'yacht', 'sleigh', 'rocket', 'spaceship', 'train', 'car transporter', 'dumper', 'garbage truck', 'lorry', 'pickup', 'tow truck', 'truck', 'van', 'bulldozer', 'digger', 'forklift', 'tractor', 'artist', 'sculptor', 'accordionist', 'piper', 'cellist', 'clarinetist', 'conductor', 'flute player', 'guitar player', 'opera singer', 'percussionist', 'piano player', 'rapper', 'saxophonist', 'singer', 'trombonist', 'trumpeter', 'violinist', 'ballet dancer', 'cameraman', 'clown', 'dancer', 'makeup artist', 'photographer', 'writer', 'figure skating', 'off road motorcycling', 'motorcycle racing', 'baby carriage', 'fire engine', 'fireman', 'police car', 'police helicopter', 'mounted police', 'policeman', 'wheelchair', 'fishing', 'hunting', 'tank', 'hang gliding', 'rhythmic gymnastics', 'horse sleigh', 'ambulance', 'dog sleigh', 'military helicopter', 'police boat', 'motorcycle police', 'soldier', 'double-decker', 'bicycle racing', 'handball', 'armoured personnel carrier', 'military truck', 'rickshaw', 'scooter', 'pole vaulting']
         for categ in update_categ:
-            load_single_dataset(categ)
+            bufs = categ.replace(' ','_')
+            folder_path = '/uploads/'+bufs+'/'
+            full_path = '/host/mic21-framework/server'+folder_path
+            try:
+                dataset = fo.load_dataset(bufs)
+                dataset.delete()
+            except:
+                print('Error in Dataset '+bufs)
+            print('Loading '+bufs)
+            dataset = fo.Dataset.from_dir(dataset_dir=full_path, dataset_type=fo.types.ImageDirectory, name=bufs)
+            dataset.persistent = True
+        threads = []
+        for categ in update_categ:
+            bufs = categ.replace(' ','_')
+            m = threading.Thread(target=load_single_dataset,args=(bufs,),daemon=True)
+            threads.append(m)
+            m.start()
+        while True:
+            ready = True
+            for t in threads:
+                if t.is_alive():
+                    ready = False
+            if ready:
+                break
         return "<html><head></head><body>Ready</body></html>"
 
 @app.route('/predict/', methods=['GET'])
