@@ -19,6 +19,7 @@ RUN curl -fsSL https://deb.nodesource.com/setup_17.x | bash -
 RUN apt-get install -y nodejs
 RUN pip3 install mongo
 RUN pip3 install fiftyone
+RUN pip3 install asyncio
 #RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
 #RUN nvm install node
 RUN npm install -g yarn
